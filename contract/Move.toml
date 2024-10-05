@@ -1,0 +1,11 @@
+[package]
+name = "OpinionPoll"
+version = "0.0.0"
+
+[dependencies]
+AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", subdir = "aptos-move/framework/aptos-framework", rev = "mainnet" }
+
+[addresses]
+my_addrx = "53ebd2be721663376dc5a39997d54f160bfb4195da6db5edb97fab2927e90c37"
+poll_addrx="0xca10b0176c34f9a8315589ff977645e04497814e9753d21f7d7e7c3d83aa7b57"
+std = "0x1"
