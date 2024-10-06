@@ -192,7 +192,7 @@ export function MyCollections() {
 
           <Card>
             <CardHeader>
-              <CardDescription>View Poll By ID</CardDescription>
+              <CardDescription>View Proposals By ID</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="p-2">

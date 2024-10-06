@@ -205,12 +205,12 @@ export function CreateCollection() {
 
   return (
     <>
-      <LaunchpadHeader title="Create Polls" />
+      <LaunchpadHeader title="Create Proposals" />
       <div className="flex flex-col items-center justify-center px-4 py-2 gap-4 max-w-screen-xl mx-auto">
         <div className="w-full flex flex-col gap-y-4">
           <Card>
             <CardHeader>
-              <CardDescription>Create Opinion Polls</CardDescription>
+              <CardDescription>Create Proposals</CardDescription>
             </CardHeader>
             <CardContent>
               <Form
@@ -268,7 +268,7 @@ export function CreateCollection() {
 
           <Card>
             <CardHeader>
-              <CardDescription>Get Poll Created By You</CardDescription>
+              <CardDescription>Get Proposals Created By You</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="p-2">
