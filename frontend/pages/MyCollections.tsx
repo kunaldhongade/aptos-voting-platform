@@ -108,14 +108,11 @@ export function MyCollections() {
       return;
     }
 
-    console.log(selectedOptions);
-
     const getSelectedOptionIndex = (pollId: number) => {
       return selectedOptions[pollId] !== undefined ? selectedOptions[pollId] : null;
     };
 
     const selectedIndex = getSelectedOptionIndex(pollId);
-    console.log(selectedIndex);
     try {
       const response = await signAndSubmitTransaction({
         sender: account?.address,
