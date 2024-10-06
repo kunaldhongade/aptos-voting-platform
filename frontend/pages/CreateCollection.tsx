@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 export function CreateCollection() {
   const { account, signAndSubmitTransaction } = useWallet();
 
-  const [polls, setPolls] = useState<Poll[]>([]);
+  const [, setPolls] = useState<Poll[]>([]);
   const [pollsCreatedBy, setPollsCreatedBy] = useState<Poll[]>([]);
   const [pollID, setPollID] = useState(0);
   const [selectedOptions, setSelectedOptions] = useState<{ [key: number]: number }>({});
@@ -134,7 +134,6 @@ export function CreateCollection() {
       } else {
         setPolls([]);
       }
-      console.log(polls);
     } catch (error) {
       console.error("Failed to fetch Proposals:", error);
     }
@@ -168,15 +167,11 @@ export function CreateCollection() {
       message.error("Please select an option to vote.");
       return;
     }
-
-    console.log(selectedOptions);
-
     const getSelectedOptionIndex = (pollId: number) => {
       return selectedOptions[pollId] !== undefined ? selectedOptions[pollId] : null;
     };
 
     const selectedIndex = getSelectedOptionIndex(pollId);
-    console.log(selectedIndex);
     try {
       const response = await signAndSubmitTransaction({
         sender: account?.address,

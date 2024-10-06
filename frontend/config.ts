@@ -20,7 +20,7 @@ export const config: Config = {
     title: "Our Story",
     subTitle: "Innovative Opinion Platform on Aptos",
     description:
-      "The PublicOpinionPoll smart contract allows users to create and vote on decentralized polls using DIDs for identity verification. It tracks poll details, vote counts, and results, while enabling event-based interactions on Aptos.",
+      "The Voting App is a decentralized platform built on the Aptos blockchain, designed to enable secure and transparent voting events. Users can create proposals, vote on various topics, and track results in real time.",
     discordLink: "https://discord.com",
     images: [Placeholder1, Placeholder2, Placeholder3],
   },
@@ -58,26 +58,26 @@ export const config: Config = {
     questions: [
       {
         title: "Is this project is Free for creator and voter?",
-        description: "Yesss! This project is completely Free to use and you can create as many Poll as you want.",
+        description: "Yesss! This project is completely Free to use and you can create as many proposal as you want.",
       },
       {
-        title: "How To Create POLLs brief info?",
+        title: "How To Create Proposal brief info?",
         description:
-          "To create a poll, connect your wallet, enter a question, options for answers, and submit. Your poll will be added to the blockchain for participants to vote.",
+          "To create a proposal, connect your wallet, enter a question, options for answers, and submit. Your proposal will be added to the blockchain for participants to vote.",
       },
       {
-        title: "How do I vote in a poll?",
+        title: "How do I vote in a Proposal?",
         description:
-          "Simply choose the poll you want to participate in, select your preferred option, and submit your vote. All votes are recorded securely on the blockchain.",
+          "Simply choose the proposal you want to participate in, select your preferred option, and submit your vote. All votes are recorded securely on the blockchain.",
       },
       {
         title: "Is it safe to use?",
         description:
-          "Yes, Opinion Poll leverages blockchain security, ensuring votes cannot be tampered with and are transparently recorded.",
+          "Yes, Opinion proposal leverages blockchain security, ensuring votes cannot be tampered with and are transparently recorded.",
       },
       {
-        title: "Can I close a poll?",
-        description: "As a poll creator, you can close your poll when it's complete to stop further voting.",
+        title: "Can I close a Proposal?",
+        description: "As a proposal creator, you can close your proposal when it's complete to stop further voting.",
       },
     ],
   },
