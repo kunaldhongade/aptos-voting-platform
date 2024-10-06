@@ -7,7 +7,7 @@ export function Header() {
     <div className="flex items-center justify-between px-4 py-2 max-w-screen-xl mx-auto w-full flex-wrap md:flex-nowrap">
       <h1 className="display">
         <Link to="/" style={{ fontFamily: "unset" }}>
-          Aptos Opinion Polls
+          Aptos Voting Platform
         </Link>
       </h1>
 
