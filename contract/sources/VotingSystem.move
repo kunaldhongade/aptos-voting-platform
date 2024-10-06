@@ -253,4 +253,52 @@ module my_addrx::VotingSystem {
 
         return (highest_option, highest_votes)
     }
+
+    #[view]
+    public fun view_votes_by_creator(creator: address): vector<VoteEvent> acquires VotesHolder {
+        let votes_holder = borrow_global<VotesHolder>(GLOBAL_VOTES_ADDRESS);
+        let votes_len = vector::length(&votes_holder.votes);
+        let result = vector::empty<VoteEvent>();
+
+        let i = 0;
+        // Iterate over all votes and find votes where the creator matches the input address
+        while (i < votes_len) {
+            let vote_ref = vector::borrow(&votes_holder.votes, i);
+            if (vote_ref.creator == creator) {
+                vector::push_back(&mut result, *vote_ref);
+            };
+            i = i + 1;
+        };
+
+        return result
+    }
+
+    #[view]
+    public fun view_votes_by_voter(voter: address): vector<VoteEvent> acquires VotesHolder {
+        let votes_holder = borrow_global<VotesHolder>(GLOBAL_VOTES_ADDRESS);
+        let votes_len = vector::length(&votes_holder.votes);
+        let result = vector::empty<VoteEvent>();
+
+        let i = 0;
+        // Iterate over all votes
+        while (i < votes_len) {
+            let vote_ref = vector::borrow(&votes_holder.votes, i);
+            let voters_len = vector::length(&vote_ref.voters);
+            
+            let j = 0;
+            // Check if the voter has voted in the current vote event
+            while (j < voters_len) {
+                let addr = vector::borrow(&vote_ref.voters, j);
+                if (*addr == voter) {
+                    vector::push_back(&mut result, *vote_ref); // Add to result if the voter is found
+                    break
+                };
+                j = j + 1;
+            };
+
+            i = i + 1;
+        };
+
+        return result
+    }
 }
