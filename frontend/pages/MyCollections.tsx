@@ -14,9 +14,10 @@ const { Column } = Table;
 const { Title, Paragraph } = Typography;
 
 interface Poll {
-  poll_id: number;
+  vote_id: number;
   creator: string;
-  question: string;
+  title: string;
+  description: string;
   option1: string;
   option2: string;
   option3: string;
@@ -35,10 +36,6 @@ export function MyCollections() {
 
   const { account, signAndSubmitTransaction } = useWallet();
 
-  useEffect(() => {
-    fetchAllPolls();
-  }, [account]);
-
   function formatTimestamp(timestamp: number) {
     const date = new Date(Number(timestamp * 1000));
     const day = String(date.getDate()).padStart(2, "0");
@@ -53,28 +50,29 @@ export function MyCollections() {
 
   const fetchAllPolls = async () => {
     try {
+      const WalletAddr = account?.address;
       const payload: InputViewFunctionData = {
-        function: `${MODULE_ADDRESS}::OpinionPoll::view_all_polls`,
+        function: `${MODULE_ADDRESS}::VotingSystem::view_votes_by_creator`,
+        functionArguments: [WalletAddr],
       };
 
       const result = await aptosClient().view({ payload });
 
-      const scholarshipsList = result[0] as Poll[];
-      console.log(scholarshipsList);
+      const pollList = result[0];
 
-      setPolls(scholarshipsList);
-
-      console.log(polls);
+      if (Array.isArray(pollList)) {
+        setPolls(pollList as Poll[]);
+      } else {
+        setPolls([]);
+      }
     } catch (error) {
-      console.error("Failed to fetch Polls:", error);
-    } finally {
+      console.error("Failed to fetch Proposals by address:", error);
     }
   };
-
   const fetchPoll = async (id: number) => {
     try {
       const payload: InputViewFunctionData = {
-        function: `${MODULE_ADDRESS}::OpinionPoll::view_poll_by_id`,
+        function: `${MODULE_ADDRESS}::VotingSystem::view_vote_by_id`,
         functionArguments: [id],
       };
 
@@ -96,6 +94,7 @@ export function MyCollections() {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleOptionChange = (poll_id: number, value: any) => {
     setSelectedOptions((prev) => ({
       ...prev,
@@ -121,7 +120,7 @@ export function MyCollections() {
       const response = await signAndSubmitTransaction({
         sender: account?.address,
         data: {
-          function: `${MODULE_ADDRESS}::OpinionPoll::vote_in_poll`,
+          function: `${MODULE_ADDRESS}::VotingSystem::vote_in_event`,
           functionArguments: [pollId, selectedIndex],
         },
       });
@@ -143,19 +142,29 @@ export function MyCollections() {
     }
   };
 
+  useEffect(() => {
+    fetchAllPolls();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [account]);
+
   return (
     <>
-      <LaunchpadHeader title="View All Polls" />
+      <LaunchpadHeader title="View All Proposals" />
       <div className="flex flex-col items-center justify-center px-4 py-2 gap-4 max-w-screen-xl mx-auto">
         <div className="w-full flex flex-col gap-y-4">
           <Card>
             <CardHeader>
-              <CardDescription>All Available Polls on the Platform</CardDescription>
+              <CardDescription>All Available Proposals on the Platform</CardDescription>
             </CardHeader>
             <CardContent>
-              <Table dataSource={polls} rowKey="poll_id" className="max-w-screen-xl mx-auto">
-                <Column title="ID" dataIndex="poll_id" />
-                <Column title="question" dataIndex="question" />
+              <Table dataSource={polls} rowKey="vote_id" className="max-w-screen-xl mx-auto">
+                <Column title="ID" dataIndex="vote_id" />
+                <Column title="Title" dataIndex="title" />
+                <Column
+                  title="Description"
+                  dataIndex="description"
+                  render={(creator: string) => creator.substring(0, 200)}
+                />
                 <Column
                   title="Donor"
                   dataIndex="creator"
@@ -176,6 +185,7 @@ export function MyCollections() {
                 <Column
                   title="End Time"
                   dataIndex="end_time"
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   render={(time: any) => formatTimestamp(time).toString()}
                   responsive={["md"]}
                 />
@@ -203,10 +213,13 @@ export function MyCollections() {
                 <Card style={{ marginTop: 16, padding: 16 }}>
                   {poll && (
                     <div>
-                      <Title level={3}>Poll ID: {poll.poll_id}</Title>
+                      <Title level={3}>Poll ID: {poll.vote_id}</Title>
                       <Divider />
                       <Paragraph>
-                        <strong>Question:</strong> {poll.question}
+                        <strong>Title:</strong> {poll.title}
+                      </Paragraph>
+                      <Paragraph>
+                        <strong>Description:</strong> {poll.description}
                       </Paragraph>
                       <Paragraph>
                         <strong>Creator:</strong> <Tag>{poll.creator}</Tag>
@@ -255,40 +268,45 @@ export function MyCollections() {
 
           <Card>
             <CardHeader>
-              <CardDescription>Get All Polls on the Platform</CardDescription>
+              <CardDescription>Get all Proposals</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="p-2">
-                {polls.map((poll, index) => (
-                  <Card key={index} className="mb-6 shadow-lg p-4">
-                    <h4 className="text-xl font-bold mb-2">{poll.question}</h4>
-                    <p className="text-sm text-gray-500 mb-4">Poll ID: {poll.poll_id}</p>
+                {polls.length > 0 ? (
+                  polls.map((vote, index) => (
+                    <Card key={index} className="mb-6 shadow-lg p-4">
+                      <h4 className="text-xl font-bold mb-2">{vote.title}</h4>
+                      <p className="text-sm text-gray-500 mb-4">Poll ID: {vote.vote_id}</p>
+                      <p className="text-sm text-gray-500 mb-4">{vote.description}</p>
 
-                    {/* Radio Group for Options */}
-                    <Radio.Group
-                      onChange={(e) => handleOptionChange(poll.poll_id, e.target.value)}
-                      value={selectedOptions[poll.poll_id]}
-                      className="flex flex-col space-y-4"
-                    >
-                      <Radio value={0} className="flex items-center space-x-3">
-                        <div className="p-2  rounded-lg">{poll.option1}</div>
-                      </Radio>
-                      <Radio value={1} className="flex items-center space-x-3">
-                        <div className="p-2  rounded-lg">{poll.option2}</div>
-                      </Radio>
-                      <Radio value={2} className="flex items-center space-x-3">
-                        <div className="p-2  rounded-lg">{poll.option3}</div>
-                      </Radio>
-                      <Radio value={3} className="flex items-center space-x-3">
-                        <div className="p-2  rounded-lg">{poll.option4}</div>
-                      </Radio>
-                    </Radio.Group>
+                      {/* Radio Group for Options */}
+                      <Radio.Group
+                        onChange={(e) => handleOptionChange(vote.vote_id, e.target.value)}
+                        value={selectedOptions[vote.vote_id]}
+                        className="flex flex-col space-y-4"
+                      >
+                        <Radio value={0} className="flex items-center space-x-3">
+                          <div className="p-2 rounded-lg">{vote.option1}</div>
+                        </Radio>
+                        <Radio value={1} className="flex items-center space-x-3">
+                          <div className="p-2 rounded-lg">{vote.option2}</div>
+                        </Radio>
+                        <Radio value={2} className="flex items-center space-x-3">
+                          <div className="p-2 rounded-lg">{vote.option3}</div>
+                        </Radio>
+                        <Radio value={3} className="flex items-center space-x-3">
+                          <div className="p-2 rounded-lg">{vote.option4}</div>
+                        </Radio>
+                      </Radio.Group>
 
-                    <Button type="submit" className="mt-4 w-full" size="lg" onClick={() => handleVote(poll.poll_id)}>
-                      Vote
-                    </Button>
-                  </Card>
-                ))}
+                      <Button type="submit" className="mt-4 w-full" size="lg" onClick={() => handleVote(vote.vote_id)}>
+                        Vote
+                      </Button>
+                    </Card>
+                  ))
+                ) : (
+                  <p>No polls found.</p>
+                )}
               </div>
             </CardContent>
           </Card>

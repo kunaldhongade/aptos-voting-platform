@@ -9,18 +9,20 @@ import { isMobile, useWallet } from "@aptos-labs/wallet-adapter-react";
 import { DatePicker, Form, message, Radio } from "antd";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 
 export function CreateCollection() {
   const { account, signAndSubmitTransaction } = useWallet();
+
   const [polls, setPolls] = useState<Poll[]>([]);
   const [pollsCreatedBy, setPollsCreatedBy] = useState<Poll[]>([]);
   const [pollID, setPollID] = useState(0);
   const [selectedOptions, setSelectedOptions] = useState<{ [key: number]: number }>({});
+
   interface Poll {
-    poll_id: number;
+    vote_id: number;
     creator: string;
-    question: string;
+    title: string;
+    description: string;
     option1: string;
     option2: string;
     option3: string;
@@ -31,11 +33,7 @@ export function CreateCollection() {
     end_time: number;
   }
 
-  useEffect(() => {
-    fetchAllPolls();
-    fetchAllPollsCreatedBy();
-  }, [account]);
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleOptionChange = (poll_id: number, value: any) => {
     setSelectedOptions((prev) => ({
       ...prev,
@@ -62,18 +60,7 @@ export function CreateCollection() {
     };
   };
 
-  // function formatTimestamp(timestamp: number) {
-  //   const date = new Date(Number(timestamp * 1000));
-  //   const day = String(date.getDate()).padStart(2, "0");
-  //   const month = date.toLocaleString("en-US", { month: "short" }).toUpperCase();
-  //   const year = date.getFullYear();
-  //   const hours = String(date.getHours()).padStart(2, "0");
-  //   const minutes = String(date.getMinutes()).padStart(2, "0");
-  //   const returnDate = `${day} ${month} ${year} ${hours}:${minutes}`;
-
-  //   return returnDate;
-  // }
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const disabledDate = (current: any) => {
     return current && current < moment().endOf("day");
   };
@@ -89,10 +76,11 @@ export function CreateCollection() {
       const transaction = await signAndSubmitTransaction({
         sender: account?.address,
         data: {
-          function: `${MODULE_ADDRESS}::OpinionPoll::create_poll`,
+          function: `${MODULE_ADDRESS}::VotingSystem::create_vote`,
           functionArguments: [
             pollId,
-            values.question,
+            values.title,
+            values.description,
             values.option1,
             values.option2,
             values.option3,
@@ -103,7 +91,7 @@ export function CreateCollection() {
       });
 
       await aptosClient().waitForTransaction({ transactionHash: transaction.hash });
-      message.success("Poll created!");
+      message.success("Proposal created!");
       fetchAllPolls();
     } catch (error) {
       if (typeof error === "object" && error !== null && "code" in error && (error as { code: number }).code === 4001) {
@@ -116,15 +104,15 @@ export function CreateCollection() {
         }
         console.error("Transaction Error:", error);
       }
-      console.log("Error creating scholarship.", error);
-    } finally {
+      console.log("Error creating Proposal.", error);
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchAllPolls = async () => {
     try {
       const payload: InputViewFunctionData = {
-        function: `${MODULE_ADDRESS}::OpinionPoll::view_all_polls`,
+        function: `${MODULE_ADDRESS}::VotingSystem::view_all_votes`,
       };
 
       const result = await aptosClient().view({ payload });
@@ -148,17 +136,16 @@ export function CreateCollection() {
       }
       console.log(polls);
     } catch (error) {
-      console.error("Failed to fetch Polls:", error);
-    } finally {
+      console.error("Failed to fetch Proposals:", error);
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchAllPollsCreatedBy = async () => {
     try {
       const WalletAddr = account?.address;
-      console.log(WalletAddr);
       const payload: InputViewFunctionData = {
-        function: `${MODULE_ADDRESS}::OpinionPoll::view_polls_by_creator`,
+        function: `${MODULE_ADDRESS}::VotingSystem::view_votes_by_creator`,
         functionArguments: [WalletAddr],
       };
 
@@ -167,28 +154,12 @@ export function CreateCollection() {
       const pollList = result[0];
 
       if (Array.isArray(pollList)) {
-        setPollsCreatedBy(
-          pollList.map((poll: any) => ({
-            poll_id: poll.poll_id,
-            creator: poll.creator,
-            question: poll.question,
-            option1: poll.option1,
-            option2: poll.option2,
-            option3: poll.option3,
-            option4: poll.option4,
-            votes: poll.votes,
-            voters: poll.voters,
-            is_open: poll.is_open,
-            end_time: poll.end_time,
-          })),
-        );
+        setPollsCreatedBy(pollList as Poll[]);
       } else {
         setPollsCreatedBy([]);
       }
-      console.log(pollsCreatedBy);
     } catch (error) {
-      console.error("Failed to fetch Polls by address:", error);
-    } finally {
+      console.error("Failed to fetch Proposals by address:", error);
     }
   };
 
@@ -210,7 +181,7 @@ export function CreateCollection() {
       const response = await signAndSubmitTransaction({
         sender: account?.address,
         data: {
-          function: `${MODULE_ADDRESS}::OpinionPoll::vote_in_poll`,
+          function: `${MODULE_ADDRESS}::VotingSystem::vote_in_event`,
           functionArguments: [pollId, selectedIndex],
         },
       });
@@ -232,11 +203,16 @@ export function CreateCollection() {
     }
   };
 
+  useEffect(() => {
+    fetchAllPolls();
+    fetchAllPollsCreatedBy();
+  }, [account, fetchAllPolls, fetchAllPollsCreatedBy]);
+
   return (
     <>
       <LaunchpadHeader title="Create Polls" />
-      <div className="flex flex-col md:flex-row items-start justify-between px-4 py-2 gap-4 max-w-screen-xl mx-auto">
-        <div className="w-full md:w-2/3 flex flex-col gap-y-4 order-2 md:order-1">
+      <div className="flex flex-col items-center justify-center px-4 py-2 gap-4 max-w-screen-xl mx-auto">
+        <div className="w-full flex flex-col gap-y-4">
           <Card>
             <CardHeader>
               <CardDescription>Create Opinion Polls</CardDescription>
@@ -258,8 +234,11 @@ export function CreateCollection() {
                   padding: "1.7rem",
                 }}
               >
-                <Form.Item label="Question" name="question" rules={[{ required: true }]}>
-                  <Input placeholder="Enter poll question" />
+                <Form.Item label="Title" name="title" rules={[{ required: true }]}>
+                  <Input placeholder="Enter Title of Proposal" />
+                </Form.Item>
+                <Form.Item label="Description" name="description" rules={[{ required: true }]}>
+                  <Input placeholder="Description goes here" />
                 </Form.Item>
                 <Form.Item label="Option 1" name="option1" rules={[{ required: true }]}>
                   <Input placeholder="Enter option 1" />
@@ -285,7 +264,7 @@ export function CreateCollection() {
                 </Form.Item>
                 <Form.Item>
                   <Button variant="submit" size="lg" className="text-base w-full" type="submit">
-                    Create Poll
+                    Create Proposal
                   </Button>
                 </Form.Item>
               </Form>
@@ -298,51 +277,42 @@ export function CreateCollection() {
             </CardHeader>
             <CardContent>
               <div className="p-2">
-                {pollsCreatedBy.map((poll, index) => (
-                  <Card key={index} className="mb-6 shadow-lg p-4">
-                    <h4 className="text-xl font-bold mb-2">{poll.question}</h4>
-                    <p className="text-sm text-gray-500 mb-4">Poll ID: {poll.poll_id}</p>
+                {pollsCreatedBy.length > 0 ? (
+                  pollsCreatedBy.map((vote, index) => (
+                    <Card key={index} className="mb-6 shadow-lg p-4">
+                      <h4 className="text-xl font-bold mb-2">{vote.title}</h4>
+                      <p className="text-sm text-gray-500 mb-4">Poll ID: {vote.vote_id}</p>
+                      <p className="text-sm text-gray-500 mb-4">{vote.description}</p>
 
-                    {/* Radio Group for Options */}
-                    <Radio.Group
-                      onChange={(e) => handleOptionChange(poll.poll_id, e.target.value)}
-                      value={selectedOptions[poll.poll_id]}
-                      className="flex flex-col space-y-4"
-                    >
-                      <Radio value={0} className="flex items-center space-x-3">
-                        <div className="p-2  rounded-lg">{poll.option1}</div>
-                      </Radio>
-                      <Radio value={1} className="flex items-center space-x-3">
-                        <div className="p-2  rounded-lg">{poll.option2}</div>
-                      </Radio>
-                      <Radio value={2} className="flex items-center space-x-3">
-                        <div className="p-2  rounded-lg">{poll.option3}</div>
-                      </Radio>
-                      <Radio value={3} className="flex items-center space-x-3">
-                        <div className="p-2  rounded-lg">{poll.option4}</div>
-                      </Radio>
-                    </Radio.Group>
+                      {/* Radio Group for Options */}
+                      <Radio.Group
+                        onChange={(e) => handleOptionChange(vote.vote_id, e.target.value)}
+                        value={selectedOptions[vote.vote_id]}
+                        className="flex flex-col space-y-4"
+                      >
+                        <Radio value={0} className="flex items-center space-x-3">
+                          <div className="p-2 rounded-lg">{vote.option1}</div>
+                        </Radio>
+                        <Radio value={1} className="flex items-center space-x-3">
+                          <div className="p-2 rounded-lg">{vote.option2}</div>
+                        </Radio>
+                        <Radio value={2} className="flex items-center space-x-3">
+                          <div className="p-2 rounded-lg">{vote.option3}</div>
+                        </Radio>
+                        <Radio value={3} className="flex items-center space-x-3">
+                          <div className="p-2 rounded-lg">{vote.option4}</div>
+                        </Radio>
+                      </Radio.Group>
 
-                    <Button type="submit" className="mt-4 w-full" size="lg" onClick={() => handleVote(poll.poll_id)}>
-                      Vote
-                    </Button>
-                  </Card>
-                ))}
+                      <Button type="submit" className="mt-4 w-full" size="lg" onClick={() => handleVote(vote.vote_id)}>
+                        Vote
+                      </Button>
+                    </Card>
+                  ))
+                ) : (
+                  <p>No polls found.</p>
+                )}
               </div>
-            </CardContent>
-          </Card>
-        </div>
-        <div className="w-full md:w-1/3 order-1 md:order-2">
-          <Card>
-            <CardHeader className="body-md-semibold">Learn More</CardHeader>
-            <CardContent>
-              <Link
-                to="https://github.com/kunaldhongade/Aptos-opinion-poll"
-                className="body-sm underline"
-                target="_blank"
-              >
-                Find out more about the Platform
-              </Link>
             </CardContent>
           </Card>
         </div>
