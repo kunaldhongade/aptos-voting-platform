@@ -5,14 +5,14 @@ import Placeholder3 from "@/assets/placeholders/bear-3.png";
 export const config: Config = {
   // Removing one or all of these socials will remove them from the page
   socials: {
-    twitter: "https://twitter.com/kunaldhongade",
+    twitter: "https://twitter.com/",
     discord: "https://discord.com",
-    homepage: "https://kunaldhongade.vercel.app",
+    homepage: "/",
   },
 
   defaultCollection: {
-    name: "Lorem Ipsum",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris congue convallis augue in pharetra.",
+    name: "Voting Proposals",
+    description: "A collection of decentralized voting proposals securely recorded on the Aptos blockchain.",
     image: Placeholder1,
   },
 
@@ -29,20 +29,20 @@ export const config: Config = {
     title: "Our Team",
     members: [
       {
-        name: "Kunal",
+        name: "Alex",
         role: "Blockchain Developer",
         img: Placeholder1,
         socials: {
-          twitter: "https://twitter.com/kunaldhongade",
+          twitter: "https://twitter.com",
         },
       },
       {
-        name: "Soham",
+        name: "Jordan",
         role: "Marketing Specialist",
         img: Placeholder2,
       },
       {
-        name: "Amrita",
+        name: "Taylor",
         role: "Community Manager",
         img: Placeholder3,
         socials: {
@@ -57,27 +57,27 @@ export const config: Config = {
 
     questions: [
       {
-        title: "Is this project is Free for creator and voter?",
-        description: "Yesss! This project is completely Free to use and you can create as many proposal as you want.",
+        title: "Is this project free for creators and voters?",
+        description: "Yes! This project is completely free to use, and you can create as many proposals as you want.",
       },
       {
-        title: "How To Create Proposal brief info?",
+        title: "How do I create a proposal?",
         description:
-          "To create a proposal, connect your wallet, enter a question, options for answers, and submit. Your proposal will be added to the blockchain for participants to vote.",
+          "To create a proposal, connect your wallet, enter a question, provide options for answers, and submit. Your proposal will be added to the blockchain for participants to vote.",
       },
       {
-        title: "How do I vote in a Proposal?",
+        title: "How do I vote in a proposal?",
         description:
           "Simply choose the proposal you want to participate in, select your preferred option, and submit your vote. All votes are recorded securely on the blockchain.",
       },
       {
         title: "Is it safe to use?",
         description:
-          "Yes, Opinion proposal leverages blockchain security, ensuring votes cannot be tampered with and are transparently recorded.",
+          "Yes, the platform leverages blockchain security, ensuring that votes cannot be tampered with and are transparently recorded.",
       },
       {
-        title: "Can I close a Proposal?",
-        description: "As a proposal creator, you can close your proposal when it's complete to stop further voting.",
+        title: "Can I close a proposal?",
+        description: "As a proposal creator, you can close your proposal once it's complete to stop further voting.",
       },
     ],
   },

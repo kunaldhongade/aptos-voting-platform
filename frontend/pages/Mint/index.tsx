@@ -37,7 +37,7 @@ export function Mint() {
         </main>
 
         <footer className="footer-container px-4 pb-6 w-full max-w-screen-xl mx-auto mt-6 md:mt-16 flex items-center justify-between">
-          <p>Developed by Kunal Dhongade</p>
+          <p>Get in Touch</p>
           <Socials />
         </footer>
         <Footer className="footer">Opinion Platform ©2024 | All Rights Reserved</Footer>
