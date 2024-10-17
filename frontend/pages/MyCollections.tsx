@@ -52,7 +52,7 @@ export function MyCollections() {
     try {
       const WalletAddr = account?.address;
       const payload: InputViewFunctionData = {
-        function: `${MODULE_ADDRESS}::VotingSystem::view_votes_by_creator`,
+        function: `${MODULE_ADDRESS}::VotingSystem::view_all_votes`,
         functionArguments: [WalletAddr],
       };
 
@@ -142,7 +142,7 @@ export function MyCollections() {
   useEffect(() => {
     fetchAllPolls();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account]);
+  }, [account, polls]);
 
   return (
     <>
