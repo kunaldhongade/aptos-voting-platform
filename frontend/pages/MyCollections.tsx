@@ -50,10 +50,9 @@ export function MyCollections() {
 
   const fetchAllPolls = async () => {
     try {
-      const WalletAddr = account?.address;
       const payload: InputViewFunctionData = {
         function: `${MODULE_ADDRESS}::VotingSystem::view_all_votes`,
-        functionArguments: [WalletAddr],
+        functionArguments: [],
       };
 
       const result = await aptosClient().view({ payload });
@@ -142,7 +141,7 @@ export function MyCollections() {
   useEffect(() => {
     fetchAllPolls();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account, polls]);
+  }, [account]);
 
   return (
     <>
